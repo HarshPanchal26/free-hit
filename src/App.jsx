@@ -9,6 +9,14 @@ function App() {
   const [category, setCategory] = useState('all')
   const [searchTerm, setSearchTerm] = useState('')
 
+  // const [suggestion , setSuggestions] = useState([])
+
+  let suggestionList = {
+    serchByProductName: [],
+    serchByDiscription: [],
+    serchByCategory: [],
+  }
+
   function filterProduct(value) {
     setCategory(value)
     filteredButtonSelected(value)
@@ -37,10 +45,35 @@ function App() {
     setCategory('all')
   }, [])
 
+  const searchProduct = async (searchTerm, product, regex) => {
+    // console.log("In" , searchTerm , product)
+    await new Promise((reslove, reject) => {
+      if (product.description.match(regex)) {
+        suggestionList.serchByDiscription.push(product.productName)
+        reslove()
+      }
+    })
+    await new Promise((reslove, reject) => {
+      if (
+        suggestionList.serchByDiscription.length == 0 &&
+        product.category.match(regex)
+      ) {
+        suggestionList.serchByCategory.push(product.productName)
+        reslove()
+      }
+    })
+  }
+
   const filteredProducts = products
     .filter((product) => {
       if (!searchTerm) return true
       const regex = new RegExp(searchTerm.trim(), 'gi')
+      if (product.productName.match(regex)) {
+        suggestionList.serchByProductName.push(product.productName)
+      }
+      if (suggestionList.serchByProductName.length == 0) {
+        searchProduct(searchTerm.trim(), product, regex)
+      }
       return (
         product.productName.match(regex) ||
         product.description.match(regex) ||
@@ -55,7 +88,11 @@ function App() {
 
   return (
     <>
-      <Header searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
+      <Header
+        searchTerm={searchTerm}
+        setSearchTerm={setSearchTerm}
+        suggestion={suggestionList}
+      />
       <Card
         filterProduct={filterProduct}
         filteredProducts={filteredProducts}
@@ -71,3 +108,17 @@ function App() {
 }
 
 export default App
+
+// if(product.productName.match(regex)){
+//   suggestionList.serchByProductName.push(product.productName)
+// }
+// if(suggestionList.serchByProductName.length === 0  &&  product.description.match(regex)){
+//   console.log("Length1", suggestionList.serchByProductName.length )
+
+//   suggestionList.serchByDiscription.push(product.productName)
+// }
+// if(suggestionList.serchByProductName.length === 0 && suggestionList.serchByDiscription.length === 0
+//    &&  product.category.match(regex) ){
+//     console.log("Length3", suggestionList.serchByProductName.length)
+//     suggestionList.serchByCategory.push(product.productName)
+//    }
