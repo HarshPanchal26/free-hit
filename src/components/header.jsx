@@ -6,33 +6,27 @@ const Header = ({ searchTerm, setSearchTerm, suggestion }) => {
   let arrayForSuggestion = []
 
   const sortSuggestedData = (data) => {
-    console.log('Retrive data', data)
-    const regex = new RegExp(
-      `^${searchTerm}|[^${searchTerm}]${searchTerm}|${searchTerm}[^\\s]*`,
-      'gi'
-    )
-    arrayForSuggestion = data
-      .filter((word) => {
-        console.log(word, word.match(regex))
-        return word.match(regex)
-      })
-      .sort((a, b) => {
-        const aIndex = a.indexOf(searchTerm)
-        const bIndex = b.indexOf(searchTerm)
-        if (aIndex === -1) return 1
-        if (bIndex === -1) return -1
-        return aIndex - bIndex
-      })
+    // console.log('Retrive data', data)
+    // const regex = new RegExp(
+    //   `^${searchTerm}|[^${searchTerm}]${searchTerm}|${searchTerm}[^\\s]*`,
+    //   'gi'
+    // )
+
+    arrayForSuggestion = data.filter((word) => {
+      return word.toLowerCase().startsWith(searchTerm.toLowerCase())
+    })
   }
-  console.log('suggestionList', arrayForSuggestion, suggestion)
 
   useEffect(() => {
     if (suggestion.serchByDiscription.length !== 0) {
       sortSuggestedData(suggestion.serchByDiscription)
+      // console.log('Discription', arrayForSuggestion , suggestion)
     } else if (suggestion.serchByProductName.length !== 0) {
       sortSuggestedData(suggestion.serchByProductName)
+      // console.log('ProductName', arrayForSuggestion , suggestion)
     } else {
       sortSuggestedData(suggestion.serchByCategory)
+      // console.log('Ctegoery', arrayForSuggestion , suggestion)
     }
   }, [suggestion])
   return (

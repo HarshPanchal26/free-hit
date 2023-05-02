@@ -3,14 +3,14 @@ import { GitHub, Twitter } from './Icons'
 const footerLinks = [
   {
     id: 1,
-    link: "https://github.com/JasonDsouza212",
-    name: "GitHub",
+    link: 'https://github.com/JasonDsouza212',
+    name: 'GitHub',
     icon: <GitHub />,
   },
   {
     id: 2,
-    link: "https://twitter.com/_Jason_Dsouza",
-    name: "Twitter",
+    link: 'https://twitter.com/_Jason_Dsouza',
+    name: 'Twitter',
     icon: <Twitter />,
   },
 ]

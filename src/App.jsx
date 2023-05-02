@@ -4,6 +4,7 @@ import Card from './components/card'
 import Footer from './components/footer'
 import products from './DB/product.json'
 import BackToTopButton from './components/BackToTop'
+import createSuggestionList from './searchEngine'
 
 function App() {
   const [category, setCategory] = useState('all')
@@ -41,39 +42,63 @@ function App() {
     })
   }
 
-  useEffect(() => {
-    setCategory('all')
-  }, [])
+  // const searchProduct = async (searchTerm, product, regex) => {
+  //   console.log("Inside ")
+  //   await new Promise ((reslove, reject)=>{
+  //     if (product.productName.match(regex)){
+  //       suggestionList.serchByProductName.push(product.productName)
+  //       reslove()
+  //     }
+  //   })
+  //   await new Promise((reslove, reject) => {
+  //     if (product.description.match(regex)) {
+  //       suggestionList.serchByDiscription.push(product.productName)
+  //       reslove()
+  //     }
+  //   })
+  //   await new Promise((reslove, reject) => {
+  //     if (
+  //       suggestionList.serchByDiscription.length == 0 &&
+  //       product.category.match(regex)
+  //     ) {
+  //       suggestionList.serchByCategory.push(product.productName)
+  //       reslove()
+  //     }
+  //   })
+  //   if(suggestionList.serchByCategory.length !== 0 || suggestionList.serchByDiscription.length !==0 ||
+  //     suggestionList.serchByProductName.length !==0){
+  //     }
+  //     createSuggestionList(suggestionList)
+  //     console.log("Res"  )
+  // }
 
-  const searchProduct = async (searchTerm, product, regex) => {
-    // console.log("In" , searchTerm , product)
-    await new Promise((reslove, reject) => {
-      if (product.description.match(regex)) {
-        suggestionList.serchByDiscription.push(product.productName)
-        reslove()
-      }
-    })
-    await new Promise((reslove, reject) => {
-      if (
-        suggestionList.serchByDiscription.length == 0 &&
-        product.category.match(regex)
-      ) {
-        suggestionList.serchByCategory.push(product.productName)
-        reslove()
-      }
-    })
+  const searchProduct = (searchTerm, product, regex) => {
+    if (product.productName.match(regex)) {
+      suggestionList.serchByProductName.push(product.productName)
+    }
+
+    if (product.description.match(regex)) {
+      suggestionList.serchByDiscription.push(product.productName)
+    }
+
+    if (product.category.match(regex)) {
+      suggestionList.serchByCategory.push(product.productName)
+    }
+
+    const finalSuggestionList = createSuggestionList(suggestionList, searchTerm)
+    console.log('Suggestion List', finalSuggestionList)
   }
 
   const filteredProducts = products
     .filter((product) => {
       if (!searchTerm) return true
-      const regex = new RegExp(searchTerm.trim(), 'gi')
-      if (product.productName.match(regex)) {
-        suggestionList.serchByProductName.push(product.productName)
-      }
-      if (suggestionList.serchByProductName.length == 0) {
-        searchProduct(searchTerm.trim(), product, regex)
-      }
+      const escapedSearchTerm = searchTerm
+        .replace(/^(\?)?([^?]|\?[^ \t\r\n\f])*$/g, '$&')
+        .replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+      const regex = new RegExp(escapedSearchTerm, 'gi')
+
+      searchProduct(searchTerm.trim(), product, regex)
+
       return (
         product.productName.match(regex) ||
         product.description.match(regex) ||
@@ -86,6 +111,9 @@ function App() {
       return nameA < nameB ? -1 : 1
     })
 
+  useEffect(() => {
+    setCategory('all')
+  }, [])
   return (
     <>
       <Header
